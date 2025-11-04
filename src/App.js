@@ -9,6 +9,7 @@ function App() {
         <p>
           Edit by Firoz and save to reload. This is awesome!
         </p>
+        <p>This is my website with CI/CD pipeline</p>
         <a
           className="App-link"
           href="https://reactjs.org"

@@ -1,15 +1,16 @@
-name: Deploy React App to GitHub Pages
+name: Build and Deploy React App to GitHub Pages
 
 on:
   push:
     branches:
-      - main   # Auto deploy when pushing to main
-  workflow_dispatch:  # Enables manual trigger button in Actions tab
+      - main   # Trigger build when developer pushes to main
+  workflow_dispatch:  # Allows manual trigger if needed
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
+    outputs:
+      build-path: ./build
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,11 +23,29 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
+      - name: Build React App
         run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: react-build
+          path: ./build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://anabia9711.github.io/react-test-app
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: react-build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./react-build
